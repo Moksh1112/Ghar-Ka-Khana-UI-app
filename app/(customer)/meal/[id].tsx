@@ -1,12 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, Platform, StatusBar, TouchableOpacity, Alert } from 'react-native';
-import { Colors, Spacing, Radius } from '@/constants/theme';
+import { Colors, Spacing, Radius, Fonts, Shadows } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppContext } from '@/store/AppContext';
 import { Image } from 'expo-image';
+import { Button } from '@/components/ui/Button';
 
 export default function MealDetailScreen() {
+  const insets = useSafeAreaInsets();
+  const { colors } = useAppContext();
+  const styles = createStyles(colors);
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { plannedMeals, providers, addToCart } = useAppContext();
@@ -17,21 +22,24 @@ export default function MealDetailScreen() {
   if (!meal || !provider) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <Text style={{ textAlign: 'center', marginTop: 40 }}>Meal not found</Text>
+        <View style={styles.headerControls}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+        <Text style={{ textAlign: 'center', marginTop: 100, color: colors.textMuted }}>Meal not found</Text>
       </SafeAreaView>
     );
   }
 
   const isSoldOut = meal.bookedServings >= meal.maxServings;
+  const percentageBooked = Math.min((meal.bookedServings / meal.maxServings) * 100, 100);
 
   const handleReserve = () => {
     if (isSoldOut) {
       Alert.alert("Sold Out", "This meal is fully booked.");
       return;
     }
-    // Set this meal in cart/checkout logic
-    // We'll clear the existing cart and add this as a single item for checkout
-    // Because the checkout process expects `cart` we can adapt it or just pass params
     addToCart({ ...meal, id: meal.id }); 
     router.push(`/(customer)/checkout?mealId=${meal.id}`);
   };
@@ -42,124 +50,172 @@ export default function MealDetailScreen() {
         
         {/* Cover Image */}
         <View style={styles.imageContainer}>
-          <Image source={meal.image} style={styles.coverImage} contentFit="cover" />
+          <Image source={meal.image} style={styles.coverImage} contentFit="cover" transition={300} />
+          
+          {/* Header Controls */}
           <View style={styles.headerControls}>
             <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color={Colors.light.text} />
+              <Ionicons name="arrow-back" size={20} color={colors.text} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="share-outline" size={24} color={Colors.light.text} />
+              <Ionicons name="heart-outline" size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={styles.content}>
-          <View style={styles.titleRow}>
-            <Text style={styles.title}>{meal.name}</Text>
+          <View style={styles.tagRow}>
+            <View style={styles.dateTag}>
+              <Text style={styles.dateTagText}>{meal.date}</Text>
+            </View>
+            <View style={styles.typeTag}>
+              <Text style={styles.typeTagText}>{meal.mealType}</Text>
+            </View>
+            <View style={{ flex: 1 }} />
             <View style={styles.ratingBadge}>
-              <Ionicons name="star" size={12} color={Colors.light.surface} />
+              <Ionicons name="star" size={14} color={colors.surface} />
               <Text style={styles.ratingText}>{meal.rating}</Text>
             </View>
           </View>
-          
-          <Text style={styles.providerName}>By {provider.name}</Text>
 
-          <View style={styles.timeInfoBox}>
-            <Ionicons name="calendar" size={20} color={Colors.light.primary} />
-            <View>
-              <Text style={styles.timeInfoLabel}>{meal.date} • {meal.mealType}</Text>
-              <Text style={styles.timeInfoValue}>{meal.startTime} – {meal.endTime}</Text>
+          <Text style={styles.title}>{meal.name}</Text>
+          
+          <TouchableOpacity style={styles.providerInlineRow} onPress={() => router.push(`/(customer)/provider/${provider.id}` as any)}>
+            <Ionicons name="restaurant-outline" size={16} color={colors.textMuted} />
+            <Text style={styles.providerNameInline}>By {provider.name}</Text>
+            <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
+          </TouchableOpacity>
+
+          {/* Key Information Cards */}
+          <View style={styles.infoCardsRow}>
+            <View style={styles.infoCard}>
+              <View style={styles.infoIconWrapper}>
+                <Ionicons name="time-outline" size={20} color={colors.primaryDark} />
+              </View>
+              <Text style={styles.infoCardLabel}>Pickup Window</Text>
+              <Text style={styles.infoCardValue}>{meal.startTime} - {meal.endTime}</Text>
+            </View>
+            <View style={styles.infoCard}>
+              <View style={styles.infoIconWrapper}>
+                <Ionicons name="bicycle-outline" size={20} color={colors.primaryDark} />
+              </View>
+              <Text style={styles.infoCardLabel}>Fulfillment</Text>
+              <Text style={styles.infoCardValue}>Bulk / Self</Text>
             </View>
           </View>
 
+          {/* Booking Progress */}
           <View style={styles.bookingStatusContainer}>
+            <View style={styles.progressHeader}>
+              <Text style={styles.bookingStatusText}>
+                <Text style={{ fontWeight: 'bold' }}>{meal.bookedServings}</Text> of {meal.maxServings} booked
+              </Text>
+              <Text style={styles.cutoffText}>Cutoff: {meal.cutoffTime}</Text>
+            </View>
             <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: `${(meal.bookedServings / meal.maxServings) * 100}%` }]} />
+              <View style={[styles.progressBarFill, { width: `${percentageBooked}%`, backgroundColor: isSoldOut ? colors.error : colors.primary }]} />
             </View>
-            <View style={styles.bookingRow}>
-              <Text style={styles.bookingStatusText}>{meal.bookedServings} of {meal.maxServings} booked</Text>
-              <Text style={styles.cutoffText}>Closes {meal.cutoffTime}</Text>
-            </View>
+            {isSoldOut && <Text style={styles.soldOutWarning}>This meal is fully booked.</Text>}
           </View>
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>About this meal</Text>
+          <Text style={styles.sectionTitle}>What's included</Text>
           <Text style={styles.description}>{meal.description}</Text>
 
           <View style={styles.divider} />
 
-          <Text style={styles.sectionTitle}>Provider Information</Text>
-          <TouchableOpacity style={styles.providerCard} onPress={() => router.push(`/(customer)/provider/${provider.id}` as any)}>
+          <Text style={styles.sectionTitle}>Meet the Provider</Text>
+          <TouchableOpacity style={styles.providerCard} onPress={() => router.push(`/(customer)/provider/${provider.id}` as any)} activeOpacity={0.9}>
             <Image source={provider.image} style={styles.providerImageSmall} contentFit="cover" />
             <View style={styles.providerInfo}>
               <Text style={styles.providerNameSmall}>{provider.name}</Text>
               <Text style={styles.providerSpeciality}>{provider.speciality}</Text>
               <Text style={styles.providerMeta}>★ {provider.rating} • {provider.reviews} reviews</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={Colors.light.icon} />
+            <View style={styles.providerActionBtn}>
+              <Text style={styles.providerActionText}>View Profile</Text>
+            </View>
           </TouchableOpacity>
 
-          <View style={{ height: 120 }} />
+          <View style={{ height: 150 + (insets.bottom || 20) }} />
         </View>
       </ScrollView>
 
       {/* BOTTOM ACTION BAR */}
-      <View style={styles.bottomBar}>
-        <View style={styles.priceContainer}>
-          <Text style={styles.priceLabel}>Total: ₹{meal.price}</Text>
-          <Text style={styles.bookingAmountText}>Reserve for ₹{meal.bookingAmount}</Text>
+      <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
+        <View style={styles.priceBreakdown}>
+          <View style={styles.priceRow}>
+            <Text style={styles.priceLabel}>Total Price</Text>
+            <Text style={styles.priceTotal}>₹{meal.price}</Text>
+          </View>
+          <View style={styles.priceRow}>
+            <Text style={styles.payNowLabel}>Pay Now (Booking)</Text>
+            <Text style={styles.payNowAmount}>₹{meal.bookingAmount}</Text>
+          </View>
+          <Text style={styles.payLaterNote}>Remaining ₹{meal.price - meal.bookingAmount} paid at collection</Text>
         </View>
-        <TouchableOpacity 
-          style={[styles.actionButton, isSoldOut && styles.actionButtonDisabled]} 
+        
+        <Button 
+          title={isSoldOut ? 'Sold Out' : `Reserve for ₹${meal.bookingAmount}`}
           onPress={handleReserve}
           disabled={isSoldOut}
-        >
-          <Text style={styles.actionButtonText}>
-            {isSoldOut ? 'Sold Out' : 'Reserve Meal'}
-          </Text>
-        </TouchableOpacity>
+          size="md"
+          style={styles.reserveButton}
+        />
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.light.background },
-  container: { flex: 1, backgroundColor: Colors.light.background },
-  imageContainer: { width: '100%', height: 280, position: 'relative' },
-  coverImage: { width: '100%', height: '100%', backgroundColor: Colors.light.border },
-  headerControls: { position: 'absolute', top: Platform.OS === 'android' ? StatusBar.currentHeight! + 10 : 50, left: Spacing.lg, right: Spacing.lg, flexDirection: 'row', justifyContent: 'space-between' },
-  iconButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: Colors.light.surface, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  content: { padding: Spacing.xl },
-  titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  title: { fontSize: 24, fontWeight: 'bold', color: Colors.light.text, flex: 1 },
-  ratingBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.light.primary, paddingHorizontal: 8, paddingVertical: 4, borderRadius: Radius.sm, gap: 4 },
-  ratingText: { color: Colors.light.surface, fontSize: 14, fontWeight: 'bold' },
-  providerName: { fontSize: 16, color: Colors.light.textMuted, marginBottom: Spacing.xl },
-  timeInfoBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF4ED', padding: Spacing.md, borderRadius: Radius.md, gap: Spacing.md, marginBottom: Spacing.xl },
-  timeInfoLabel: { fontSize: 13, color: Colors.light.primaryDark, fontWeight: '600', marginBottom: 2 },
-  timeInfoValue: { fontSize: 15, fontWeight: 'bold', color: Colors.light.text },
-  bookingStatusContainer: { marginBottom: Spacing.xl },
-  progressBarBg: { height: 8, backgroundColor: Colors.light.border, borderRadius: 4, marginBottom: 8, overflow: 'hidden' },
-  progressBarFill: { height: '100%', backgroundColor: Colors.light.primary, borderRadius: 4 },
-  bookingRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  bookingStatusText: { fontSize: 13, fontWeight: '600', color: Colors.light.text },
-  cutoffText: { fontSize: 13, fontWeight: '600', color: '#ef4444' },
-  divider: { height: 1, backgroundColor: Colors.light.border, marginVertical: Spacing.lg },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: Colors.light.text, marginBottom: Spacing.md },
-  description: { fontSize: 15, color: Colors.light.text, lineHeight: 22 },
-  providerCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.light.surface, padding: Spacing.md, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.light.border },
-  providerImageSmall: { width: 50, height: 50, borderRadius: 25, backgroundColor: Colors.light.border },
-  providerInfo: { flex: 1, marginLeft: Spacing.md },
-  providerNameSmall: { fontSize: 16, fontWeight: 'bold', color: Colors.light.text, marginBottom: 2 },
-  providerSpeciality: { fontSize: 13, color: Colors.light.textMuted, marginBottom: 4 },
-  providerMeta: { fontSize: 12, fontWeight: '500', color: Colors.light.text },
-  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: Colors.light.surface, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing.xl, paddingVertical: Spacing.lg, borderTopWidth: 1, borderTopColor: Colors.light.border, shadowColor: '#000', shadowOffset: { width: 0, height: -2 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 10 },
-  priceContainer: { flex: 1 },
-  priceLabel: { fontSize: 12, color: Colors.light.textMuted, marginBottom: 2 },
-  bookingAmountText: { fontSize: 18, fontWeight: 'bold', color: Colors.light.text },
-  actionButton: { backgroundColor: Colors.light.primary, paddingHorizontal: Spacing.xl, paddingVertical: Spacing.md, borderRadius: Radius.round },
-  actionButtonDisabled: { backgroundColor: Colors.light.border },
-  actionButtonText: { color: Colors.light.surface, fontWeight: 'bold', fontSize: 16 },
+const createStyles = (colors: any) => StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+  container: { flex: 1, backgroundColor: colors.background },
+  imageContainer: { width: '100%', height: 320, position: 'relative' },
+  coverImage: { width: '100%', height: '100%', backgroundColor: colors.border },
+  headerControls: { position: 'absolute', top: Platform.OS === 'android' ? StatusBar.currentHeight! + Spacing.sm : 50, left: Spacing.lg, right: Spacing.lg, flexDirection: 'row', justifyContent: 'space-between' },
+  iconButton: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.9)', alignItems: 'center', justifyContent: 'center', ...Shadows.card },
+  content: { padding: Spacing.xl, backgroundColor: colors.background, borderTopLeftRadius: 32, borderTopRightRadius: 32, marginTop: -32 },
+  tagRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.md, gap: Spacing.sm },
+  dateTag: { backgroundColor: colors.primary, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.round },
+  dateTagText: { color: colors.surface, fontSize: 13, fontWeight: 'bold' },
+  typeTag: { backgroundColor: colors.surface, paddingHorizontal: 12, paddingVertical: 6, borderRadius: Radius.round, borderWidth: 1, borderColor: colors.border },
+  typeTagText: { color: colors.text, fontSize: 13, fontWeight: '600' },
+  ratingBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.text, paddingHorizontal: 10, paddingVertical: 6, borderRadius: Radius.round, gap: 4 },
+  ratingText: { color: colors.surface, fontSize: 14, fontWeight: 'bold' },
+  title: { fontSize: 28, fontWeight: '800', color: colors.text, marginBottom: Spacing.sm, lineHeight: 34, fontFamily: Fonts.sans },
+  providerInlineRow: { flexDirection: 'row', alignItems: 'center', marginBottom: Spacing.xl },
+  providerNameInline: { fontSize: 15, color: colors.textMuted, fontWeight: '500', marginLeft: 6, marginRight: 4 },
+  infoCardsRow: { flexDirection: 'row', gap: Spacing.md, marginBottom: Spacing.xl },
+  infoCard: { flex: 1, backgroundColor: colors.surface, padding: Spacing.md, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border },
+  infoIconWrapper: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#FFF4ED', alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.sm },
+  infoCardLabel: { fontSize: 12, color: colors.textMuted, marginBottom: 2 },
+  infoCardValue: { fontSize: 14, fontWeight: 'bold', color: colors.text },
+  bookingStatusContainer: { backgroundColor: colors.surface, padding: Spacing.lg, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border },
+  progressHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: Spacing.md },
+  bookingStatusText: { fontSize: 14, color: colors.text },
+  cutoffText: { fontSize: 14, fontWeight: '600', color: colors.error },
+  progressBarBg: { height: 8, backgroundColor: colors.background, borderRadius: 4, overflow: 'hidden' },
+  progressBarFill: { height: '100%', borderRadius: 4 },
+  soldOutWarning: { color: colors.error, fontSize: 13, fontWeight: '600', marginTop: Spacing.sm, textAlign: 'center' },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: Spacing.xl },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: colors.text, marginBottom: Spacing.md },
+  description: { fontSize: 16, color: colors.text, lineHeight: 24 },
+  providerCard: { backgroundColor: colors.surface, padding: Spacing.md, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border },
+  providerImageSmall: { width: 56, height: 56, borderRadius: Radius.md, backgroundColor: colors.background, marginBottom: Spacing.sm },
+  providerInfo: { marginBottom: Spacing.md },
+  providerNameSmall: { fontSize: 18, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
+  providerSpeciality: { fontSize: 14, color: colors.textMuted, marginBottom: 4 },
+  providerMeta: { fontSize: 13, fontWeight: '500', color: colors.text },
+  providerActionBtn: { alignItems: 'center', paddingVertical: Spacing.sm, backgroundColor: colors.background, borderRadius: Radius.sm },
+  providerActionText: { color: colors.text, fontWeight: '600', fontSize: 14 },
+  bottomBar: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: colors.surface, paddingHorizontal: Spacing.xl, paddingTop: Spacing.md, paddingBottom: Platform.OS === 'ios' ? 34 : 20, borderTopWidth: 1, borderTopColor: colors.border, ...Shadows.card },
+  priceBreakdown: { marginBottom: 8 },
+  priceRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 },
+  priceLabel: { fontSize: 14, color: colors.textMuted },
+  priceTotal: { fontSize: 14, fontWeight: '600', color: colors.textMuted, textDecorationLine: 'line-through' },
+  payNowLabel: { fontSize: 15, fontWeight: 'bold', color: colors.text },
+  payNowAmount: { fontSize: 20, fontWeight: 'bold', color: colors.primaryDark },
+  payLaterNote: { fontSize: 12, color: colors.textMuted, marginTop: 2 },
+  reserveButton: { marginTop: 0 },
 });

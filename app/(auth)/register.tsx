@@ -3,8 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingVi
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Radius, Fonts } from '@/constants/theme';
 import { Ionicons } from '@expo/vector-icons';
+import { useAppContext } from '@/store/AppContext';
 
 export default function RegisterScreen() {
+  const { colors } = useAppContext();
+  const styles = createStyles(colors);
   const router = useRouter();
   const [role, setRole] = useState<'CUSTOMER' | 'PROVIDER'>('CUSTOMER');
   const [name, setName] = useState('');
@@ -28,7 +31,7 @@ export default function RegisterScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={Colors.light.text} />
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
 
         <View style={styles.headerContainer}>
@@ -55,7 +58,7 @@ export default function RegisterScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Full Name</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="person-outline" size={20} color={Colors.light.icon} style={styles.inputIcon} />
+              <Ionicons name="person-outline" size={20} color={colors.icon} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Moksh Sharma"
@@ -68,7 +71,7 @@ export default function RegisterScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email Address</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="mail-outline" size={20} color={Colors.light.icon} style={styles.inputIcon} />
+              <Ionicons name="mail-outline" size={20} color={colors.icon} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="moksh@example.com"
@@ -83,7 +86,7 @@ export default function RegisterScreen() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Password</Text>
             <View style={styles.inputWrapper}>
-              <Ionicons name="lock-closed-outline" size={20} color={Colors.light.icon} style={styles.inputIcon} />
+              <Ionicons name="lock-closed-outline" size={20} color={colors.icon} style={styles.inputIcon} />
               <TextInput
                 style={styles.input}
                 placeholder="Create a password"
@@ -104,10 +107,10 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -125,17 +128,17 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: Fonts.sans,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: colors.text,
     marginBottom: Spacing.xs,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.light.textMuted,
+    color: colors.textMuted,
     fontFamily: Fonts.sans,
   },
   roleSelector: {
     flexDirection: 'row',
-    backgroundColor: Colors.light.border,
+    backgroundColor: colors.border,
     borderRadius: Radius.md,
     padding: 4,
     marginBottom: Spacing.xl,
@@ -147,7 +150,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   roleButtonActive: {
-    backgroundColor: Colors.light.surface,
+    backgroundColor: colors.surface,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -157,10 +160,10 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.light.textMuted,
+    color: colors.textMuted,
   },
   roleTextActive: {
-    color: Colors.light.text,
+    color: colors.text,
   },
   formContainer: {
     width: '100%',
@@ -171,15 +174,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.light.text,
+    color: colors.text,
     marginBottom: Spacing.xs,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.light.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: colors.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
   },
@@ -190,17 +193,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Spacing.md,
     fontSize: 16,
-    color: Colors.light.text,
+    color: colors.text,
   },
   primaryButton: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: colors.primary,
     paddingVertical: Spacing.md,
     borderRadius: Radius.round,
     alignItems: 'center',
     marginTop: Spacing.md,
   },
   primaryButtonText: {
-    color: Colors.light.surface,
+    color: colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { MOCK_USERS, MOCK_PROVIDERS, MOCK_MEALS, MOCK_LOCATIONS, MOCK_PLANNED_MEALS } from './mockData';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Colors } from '@/constants/theme';
 
 export type PlannedMeal = typeof MOCK_PLANNED_MEALS[0];
 
@@ -50,6 +52,9 @@ interface AppContextType {
   approveProvider: (id: string) => void;
   
   meals: typeof MOCK_MEALS;
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  colors: typeof Colors.light;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -64,6 +69,22 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [meals, setMeals] = useState(MOCK_MEALS);
   const [plannedMeals, setPlannedMeals] = useState<PlannedMeal[]>(MOCK_PLANNED_MEALS);
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [theme, setThemeState] = useState<'light' | 'dark'>('light');
+
+  React.useEffect(() => {
+    AsyncStorage.getItem('app_theme').then((savedTheme) => {
+      if (savedTheme === 'light' || savedTheme === 'dark') {
+        setThemeState(savedTheme);
+      }
+    });
+  }, []);
+
+  const setTheme = (newTheme: 'light' | 'dark') => {
+    setThemeState(newTheme);
+    AsyncStorage.setItem('app_theme', newTheme);
+  };
+
+  const colors = Colors[theme];
 
   const login = (role: 'CUSTOMER' | 'PROVIDER' | 'ADMIN') => {
     setUser(MOCK_USERS[role.toLowerCase() as keyof typeof MOCK_USERS]);
@@ -167,7 +188,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       reservations, placeReservation, updateReservationStatus,
       favorites, toggleFavorite,
       providers, approveProvider,
-      meals
+      meals, theme, setTheme, colors
     }}>
       {children}
     </AppContext.Provider>

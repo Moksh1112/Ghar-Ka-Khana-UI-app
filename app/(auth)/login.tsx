@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAppContext } from '@/store/AppContext';
 
 export default function LoginScreen() {
+  const { colors } = useAppContext();
+  const styles = createStyles(colors);
   const router = useRouter();
   const { login } = useAppContext();
 
@@ -17,35 +19,35 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container} 
+    <KeyboardAvoidingView
+      style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-        
+
         <View style={styles.headerContainer}>
           <Text style={styles.emoji}>🏠</Text>
           <Text style={styles.title}>Ghar Ka Khana</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+          {/* <Text style={styles.subtitle}>Sign in to continue</Text> */}
         </View>
 
         <View style={styles.formContainer}>
-          <Text style={{ textAlign: 'center', marginBottom: Spacing.xl, color: Colors.light.textMuted }}>
+          <Text style={{ textAlign: 'center', marginBottom: Spacing.xl, color: colors.textMuted }}>
             Log in to your account
           </Text>
 
           <TouchableOpacity style={styles.primaryButton} onPress={() => handleLogin('CUSTOMER')}>
-            <Ionicons name="person" size={20} color={Colors.light.surface} style={{ marginRight: Spacing.sm }} />
+            <Ionicons name="person" size={20} color={colors.surface} style={{ marginRight: Spacing.sm }} />
             <Text style={styles.primaryButtonText}>Sign In as Customer</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.secondaryButton} onPress={() => handleLogin('PROVIDER')}>
-            <Ionicons name="restaurant" size={20} color={Colors.light.text} style={{ marginRight: Spacing.sm }} />
+            <Ionicons name="restaurant" size={20} color={colors.text} style={{ marginRight: Spacing.sm }} />
             <Text style={styles.secondaryButtonText}>Sign In as Provider</Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity style={styles.secondaryButton} onPress={() => handleLogin('ADMIN')}>
-            <Ionicons name="settings" size={20} color={Colors.light.text} style={{ marginRight: Spacing.sm }} />
+            <Ionicons name="settings" size={20} color={colors.text} style={{ marginRight: Spacing.sm }} />
             <Text style={styles.secondaryButtonText}>Sign In as Admin</Text>
           </TouchableOpacity>
 
@@ -56,10 +58,10 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -78,12 +80,12 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: Fonts.sans,
     fontWeight: 'bold',
-    color: Colors.light.text,
+    color: colors.text,
     marginBottom: Spacing.xs,
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.light.textMuted,
+    color: colors.textMuted,
     fontFamily: Fonts.sans,
   },
   formContainer: {
@@ -95,15 +97,15 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.light.text,
+    color: colors.text,
     marginBottom: Spacing.xs,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.light.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: colors.border,
     borderRadius: Radius.md,
     paddingHorizontal: Spacing.md,
   },
@@ -114,19 +116,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: Spacing.md,
     fontSize: 16,
-    color: Colors.light.text,
+    color: colors.text,
   },
   forgotPassword: {
     alignSelf: 'flex-end',
     marginBottom: Spacing.lg,
   },
   forgotPasswordText: {
-    color: Colors.light.primary,
+    color: colors.primary,
     fontWeight: '600',
     fontSize: 14,
   },
   primaryButton: {
-    backgroundColor: Colors.light.primary,
+    backgroundColor: colors.primary,
     flexDirection: 'row',
     paddingVertical: Spacing.md,
     borderRadius: Radius.round,
@@ -135,12 +137,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   primaryButtonText: {
-    color: Colors.light.surface,
+    color: colors.surface,
     fontSize: 16,
     fontWeight: 'bold',
   },
   secondaryButton: {
-    backgroundColor: Colors.light.surface,
+    backgroundColor: colors.surface,
     flexDirection: 'row',
     paddingVertical: Spacing.md,
     borderRadius: Radius.round,
@@ -148,10 +150,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.light.border,
+    borderColor: colors.border,
   },
   secondaryButtonText: {
-    color: Colors.light.text,
+    color: colors.text,
     fontSize: 16,
     fontWeight: '600',
   }

@@ -7,6 +7,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAppContext } from '@/store/AppContext';
 
 export default function ProviderDetailScreen() {
+  const { colors } = useAppContext();
+  const styles = createStyles(colors);
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { providers, meals, addToCart } = useAppContext();
@@ -18,7 +20,7 @@ export default function ProviderDetailScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <Text style={{ textAlign: 'center', marginTop: 100 }}>Provider not found</Text>
-        <TouchableOpacity onPress={() => router.back()}><Text style={{ textAlign: 'center', color: Colors.light.primary }}>Go Back</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => router.back()}><Text style={{ textAlign: 'center', color: colors.primary }}>Go Back</Text></TouchableOpacity>
       </SafeAreaView>
     );
   }
@@ -36,10 +38,10 @@ export default function ProviderDetailScreen() {
           <Image source={provider.image} style={styles.coverImage} contentFit="cover" />
           <View style={styles.headerControls}>
             <TouchableOpacity onPress={() => router.back()} style={styles.iconButton}>
-              <Ionicons name="arrow-back" size={24} color={Colors.light.text} />
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="heart-outline" size={24} color={Colors.light.text} />
+              <Ionicons name="heart-outline" size={24} color={colors.text} />
             </TouchableOpacity>
           </View>
         </View>
@@ -50,7 +52,7 @@ export default function ProviderDetailScreen() {
           
           <View style={styles.metaRow}>
             <View style={styles.metaBadge}>
-              <Ionicons name="star" size={14} color={Colors.light.surface} />
+              <Ionicons name="star" size={14} color={colors.surface} />
               <Text style={styles.metaBadgeText}>{provider.rating}</Text>
             </View>
             <Text style={styles.metaText}>{provider.reviews} reviews • {provider.distance}</Text>
@@ -83,29 +85,29 @@ export default function ProviderDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.light.background, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+const createStyles = (colors: any) => StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
   container: { flex: 1 },
   imageContainer: { height: 220, position: 'relative' },
   coverImage: { width: '100%', height: '100%' },
   headerControls: { position: 'absolute', top: Spacing.md, left: Spacing.md, right: Spacing.md, flexDirection: 'row', justifyContent: 'space-between' },
   iconButton: { backgroundColor: 'rgba(255,255,255,0.9)', padding: 8, borderRadius: Radius.round },
-  infoSection: { padding: Spacing.lg, backgroundColor: Colors.light.surface, borderBottomWidth: 1, borderBottomColor: Colors.light.border },
-  providerName: { fontSize: 24, fontWeight: 'bold', color: Colors.light.text, marginBottom: 4 },
-  speciality: { fontSize: 16, color: Colors.light.textMuted, marginBottom: Spacing.md },
+  infoSection: { padding: Spacing.lg, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border },
+  providerName: { fontSize: 24, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
+  speciality: { fontSize: 16, color: colors.textMuted, marginBottom: Spacing.md },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  metaBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.light.primary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: Radius.sm, gap: 4 },
-  metaBadgeText: { color: Colors.light.surface, fontWeight: 'bold', fontSize: 13 },
-  metaText: { fontSize: 14, color: Colors.light.textMuted },
+  metaBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.primary, paddingHorizontal: 6, paddingVertical: 2, borderRadius: Radius.sm, gap: 4 },
+  metaBadgeText: { color: colors.surface, fontWeight: 'bold', fontSize: 13 },
+  metaText: { fontSize: 14, color: colors.textMuted },
   sectionHeader: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md, marginTop: Spacing.sm },
-  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: Colors.light.text },
-  foodCard: { flexDirection: 'row', backgroundColor: Colors.light.surface, marginHorizontal: Spacing.lg, marginBottom: Spacing.md, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.light.border, padding: Spacing.sm },
-  foodImage: { width: 100, height: 100, borderRadius: Radius.md, backgroundColor: Colors.light.background },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: colors.text },
+  foodCard: { flexDirection: 'row', backgroundColor: colors.surface, marginHorizontal: Spacing.lg, marginBottom: Spacing.md, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, padding: Spacing.sm },
+  foodImage: { width: 100, height: 100, borderRadius: Radius.md, backgroundColor: colors.background },
   foodCardContent: { flex: 1, marginLeft: Spacing.md, justifyContent: 'center' },
-  foodName: { fontSize: 16, fontWeight: 'bold', color: Colors.light.text, marginBottom: 4 },
-  foodDesc: { fontSize: 12, color: Colors.light.textMuted, marginBottom: Spacing.md },
+  foodName: { fontSize: 16, fontWeight: 'bold', color: colors.text, marginBottom: 4 },
+  foodDesc: { fontSize: 12, color: colors.textMuted, marginBottom: Spacing.md },
   foodBottomRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  foodPrice: { fontSize: 16, fontWeight: 'bold', color: Colors.light.text },
-  addButton: { backgroundColor: Colors.light.primary, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.round },
-  addButtonText: { color: Colors.light.surface, fontWeight: 'bold', fontSize: 14 },
+  foodPrice: { fontSize: 16, fontWeight: 'bold', color: colors.text },
+  addButton: { backgroundColor: colors.primary, paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm, borderRadius: Radius.round },
+  addButtonText: { color: colors.surface, fontWeight: 'bold', fontSize: 14 },
 });

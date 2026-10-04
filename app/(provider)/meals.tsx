@@ -6,6 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 
 export default function ProviderMealsScreen() {
+  const { colors } = useAppContext();
+  const styles = createStyles(colors);
   const { plannedMeals, user } = useAppContext();
   const providerMeals = plannedMeals.filter(m => m.providerId === user?.id);
 
@@ -17,7 +19,7 @@ export default function ProviderMealsScreen() {
       
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <TouchableOpacity style={styles.addButton}>
-          <Ionicons name="add" size={24} color={Colors.light.surface} />
+          <Ionicons name="add" size={24} color={colors.surface} />
           <Text style={styles.addButtonText}>Plan New Meal</Text>
         </TouchableOpacity>
 
@@ -28,7 +30,7 @@ export default function ProviderMealsScreen() {
               <View style={styles.mealHeader}>
                 <Text style={styles.mealName}>{meal.name}</Text>
                 <View style={[styles.statusBadge, { backgroundColor: meal.status === 'ACTIVE' ? '#ECFCCB' : '#F3F4F6' }]}>
-                  <Text style={[styles.statusText, { color: meal.status === 'ACTIVE' ? '#65A30D' : Colors.light.textMuted }]}>{meal.status}</Text>
+                  <Text style={[styles.statusText, { color: meal.status === 'ACTIVE' ? '#65A30D' : colors.textMuted }]}>{meal.status}</Text>
                 </View>
               </View>
               
@@ -53,7 +55,7 @@ export default function ProviderMealsScreen() {
         ))}
 
         {providerMeals.length === 0 && (
-          <Text style={{ textAlign: 'center', color: Colors.light.textMuted, marginTop: 40 }}>You haven't planned any meals yet.</Text>
+          <Text style={{ textAlign: 'center', color: colors.textMuted, marginTop: 40 }}>You haven't planned any meals yet.</Text>
         )}
         
         <View style={{ height: 40 }} />
@@ -62,23 +64,23 @@ export default function ProviderMealsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: Colors.light.background, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
-  header: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md, backgroundColor: Colors.light.surface, borderBottomWidth: 1, borderBottomColor: Colors.light.border },
-  headerTitle: { fontSize: 24, fontWeight: 'bold', color: Colors.light.text },
+const createStyles = (colors: any) => StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: colors.background, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 },
+  header: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.border },
+  headerTitle: { fontSize: 24, fontWeight: 'bold', color: colors.text },
   container: { flex: 1, padding: Spacing.lg },
-  addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.light.primary, padding: Spacing.md, borderRadius: Radius.round, marginBottom: Spacing.xl, gap: Spacing.sm },
-  addButtonText: { color: Colors.light.surface, fontWeight: 'bold', fontSize: 16 },
-  mealCard: { backgroundColor: Colors.light.surface, borderRadius: Radius.md, borderWidth: 1, borderColor: Colors.light.border, marginBottom: Spacing.md, overflow: 'hidden' },
-  mealImage: { width: '100%', height: 120, backgroundColor: Colors.light.background },
+  addButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary, padding: Spacing.md, borderRadius: Radius.round, marginBottom: Spacing.xl, gap: Spacing.sm },
+  addButtonText: { color: colors.surface, fontWeight: 'bold', fontSize: 16 },
+  mealCard: { backgroundColor: colors.surface, borderRadius: Radius.md, borderWidth: 1, borderColor: colors.border, marginBottom: Spacing.md, overflow: 'hidden' },
+  mealImage: { width: '100%', height: 120, backgroundColor: colors.background },
   mealContent: { padding: Spacing.md },
   mealHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-  mealName: { fontSize: 16, fontWeight: 'bold', color: Colors.light.text },
+  mealName: { fontSize: 16, fontWeight: 'bold', color: colors.text },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: Radius.sm },
   statusText: { fontSize: 10, fontWeight: 'bold' },
-  mealDate: { fontSize: 13, color: Colors.light.textMuted, marginBottom: Spacing.md },
-  mealStats: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: Colors.light.border, paddingTop: Spacing.md },
+  mealDate: { fontSize: 13, color: colors.textMuted, marginBottom: Spacing.md },
+  mealStats: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: Spacing.md },
   statBox: { flex: 1 },
-  statLabel: { fontSize: 11, color: Colors.light.textMuted, marginBottom: 2 },
-  statValue: { fontSize: 14, fontWeight: '600', color: Colors.light.text },
+  statLabel: { fontSize: 11, color: colors.textMuted, marginBottom: 2 },
+  statValue: { fontSize: 14, fontWeight: '600', color: colors.text },
 });
